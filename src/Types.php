@@ -10,7 +10,7 @@ namespace RunApi\GeminiOmni;
 final class Types
 {
     /** @var list<string> */
-    public const TEXT_TO_VIDEO_MODELS = ['gemini-omni-text-to-video'];
+    public const TEXT_TO_VIDEO_MODELS = ['gemini-omni-flash-preview', 'gemini-omni-text-to-video'];
 
     /** @var list<string> */
     public const CREATE_AUDIO_MODELS = ['gemini-omni-audio'];

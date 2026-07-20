@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.0](https://github.com/runapi-ai/gemini-omni-php/releases/tag/v0.2.0) - 2026-07-20
+
+### Added
+- Add prompt-only Gemini Omni Flash Preview text-to-video requests with model-specific validation.
+
+
 ## [v0.1.0](https://github.com/runapi-ai/gemini-omni-php/releases/tag/v0.1.0) - 2026-06-25
 
 ### Added

@@ -78,6 +78,26 @@ final class GeminiOmniClientTest extends TestCase
         self::assertSame('/api/v1/gemini_omni/text_to_video/task_1', $transport->requests[1]->getUri()->getPath());
     }
 
+    public function testFlashPreviewSendsModelWithoutDuration(): void
+    {
+        $transport = new QueueHttpClient([
+            new Response(200, [], '{"id":"task_flash","status":"processing"}'),
+        ]);
+        $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
+
+        $client->textToVideo->create([
+            'model' => 'gemini-omni-flash-preview',
+            'prompt' => 'A paper airplane flying through a sunlit studio',
+            'aspect_ratio' => '9:16',
+            'output_resolution' => '720p',
+        ]);
+
+        $body = json_decode((string) $transport->requests[0]->getBody(), true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertSame('gemini-omni-flash-preview', $body['model']);
+        self::assertArrayNotHasKey('duration_seconds', $body);
+    }
+
     public function testCompletedResponseRequiresResultFiles(): void
     {
         $transport = new QueueHttpClient([

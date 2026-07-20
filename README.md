@@ -29,18 +29,19 @@ $voice = $client->createAudio->run([
 ]);
 
 $task = $client->textToVideo->create([
-    'model' => 'gemini-omni-text-to-video',
-    'prompt' => 'A narrator walks through a futuristic city',
-    'duration_seconds' => 6,
-    'audio_ids' => [$voice->audio->id],
+    'model' => 'gemini-omni-flash-preview',
+    'prompt' => 'A paper airplane glides through a sunlit studio.',
+    'aspect_ratio' => '16:9',
+    'output_resolution' => '720p',
 ]);
 
 $status = $client->textToVideo->get($task->id);
 
 $result = $client->textToVideo->run([
-    'model' => 'gemini-omni-text-to-video',
-    'prompt' => 'A narrator introduces a compact product demo',
-    'duration_seconds' => 6,
+    'model' => 'gemini-omni-flash-preview',
+    'prompt' => 'A tiny paper boat floats through a glowing cave.',
+    'aspect_ratio' => '9:16',
+    'output_resolution' => '720p',
 ]);
 
 echo $result->videos[0]->url . PHP_EOL;
@@ -57,7 +58,7 @@ All SDK exceptions inherit from `RunApi\Core\Errors\RunApiException`, including 
 - Model page: https://runapi.ai/models/gemini-omni
 - SDK docs: https://runapi.ai/docs#sdk-gemini-omni
 - Product docs: https://runapi.ai/docs#gemini-omni
-- Pricing and rate limits: https://runapi.ai/models/gemini-omni
+- Flash Preview pricing and rate limits: https://runapi.ai/models/gemini-omni/flash-preview
 - Full catalog: https://runapi.ai/models
 - GitHub repository: https://github.com/runapi-ai/gemini-omni-php
 - Multi-language SDK repository: https://github.com/runapi-ai/gemini-omni-sdk
