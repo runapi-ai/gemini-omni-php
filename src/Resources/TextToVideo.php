@@ -12,22 +12,24 @@ use RunApi\GeminiOmni\Models\CompletedVideoTaskResponse;
 use RunApi\GeminiOmni\Models\VideoTaskResponse;
 use RunApi\GeminiOmni\Types;
 
-/**
- * Generates video from a prompt with optional characters, audio voices, reference images, and video clips. This is async -- use create()/get() for manual polling, or run() for automatic polling.
- */
+/** Text to video operations for Gemini Omni. */
 readonly class TextToVideo extends TypedConfiguredResource
 {
     /**
-     * Submits a Gemini Omni text-to-video task and returns immediately with a task id.
+     * Create a text to video task and return immediately with a task id.
      *
      * @param array{
-     *   model: string,
      *   prompt: string,
      *   aspect_ratio?: string,
+     *   audio_ids?: list<string>,
      *   callback_url?: string,
+     *   character_ids?: list<string>,
      *   duration_seconds?: int,
+     *   model?: string,
      *   output_resolution?: string,
-     *   reference_image_urls?: list<string>
+     *   reference_image_urls?: list<string>,
+     *   seed?: int,
+     *   video_list?: list<array{url: string, start: int, ends: int}>
      * } $params
      */
     public function create(array $params, ?RequestOptions $options = null): TaskCreateResponse
@@ -35,9 +37,7 @@ readonly class TextToVideo extends TypedConfiguredResource
         return parent::create($params, $options);
     }
 
-    /**
-     * Fetches the current status of a Gemini Omni text-to-video task by id.
-     */
+    /** Fetch the current status of a text to video task. */
     public function get(string $id, ?RequestOptions $options = null): VideoTaskResponse
     {
         $response = parent::get($id, $options);
@@ -47,16 +47,20 @@ readonly class TextToVideo extends TypedConfiguredResource
     }
 
     /**
-     * Submits a Gemini Omni text-to-video task and polls until it completes.
+     * Create a text to video task and poll until it completes.
      *
      * @param array{
-     *   model: string,
      *   prompt: string,
      *   aspect_ratio?: string,
+     *   audio_ids?: list<string>,
      *   callback_url?: string,
+     *   character_ids?: list<string>,
      *   duration_seconds?: int,
+     *   model?: string,
      *   output_resolution?: string,
-     *   reference_image_urls?: list<string>
+     *   reference_image_urls?: list<string>,
+     *   seed?: int,
+     *   video_list?: list<array{url: string, start: int, ends: int}>
      * } $params
      */
     public function run(array $params, ?RequestOptions $options = null): CompletedVideoTaskResponse
@@ -67,9 +71,7 @@ readonly class TextToVideo extends TypedConfiguredResource
         return $response;
     }
 
-    /**
-     * Create the resource using the shared RunAPI HTTP transport.
-     */
+    /** Create the resource using the shared RunAPI HTTP transport. */
     public static function fromHttp(HttpClient $http): self
     {
         return new self(

@@ -7,16 +7,13 @@ namespace RunApi\GeminiOmni\Models;
 use RunApi\Core\Models\TaskResponse;
 use RunApi\Core\Support\Payload;
 
-/**
- * Async video task response with lifecycle status and output files.
- */
+/** Async video task response with lifecycle status and output videos. */
 readonly class VideoTaskResponse extends TaskResponse
 {
     /**
-     * Create a video task response value object.
-     *
-     * @param list<Video> $videos
-     * @param array<string, mixed> $raw
+     * @param list<Video> $videos Generated video files when the task has completed.
+
+     * @param array<string, mixed> $raw Raw response payload preserved by `toArray()`.
      */
     public function __construct(?string $id, string $status, ?string $error = null, public array $videos = [], array $raw = [])
     {
@@ -24,7 +21,7 @@ readonly class VideoTaskResponse extends TaskResponse
     }
 
     /**
-     * Hydrate a video task response from a RunAPI response object.
+     * Hydrate a task status response from a RunAPI response object.
      *
      * @param array<string, mixed> $raw
      */
@@ -42,4 +39,6 @@ readonly class VideoTaskResponse extends TaskResponse
     {
         return Payload::listOf($raw, 'videos', Video::fromArray(...), $required);
     }
+
+
 }

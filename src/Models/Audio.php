@@ -7,15 +7,12 @@ namespace RunApi\GeminiOmni\Models;
 use RunApi\Core\Models\BaseModel;
 use RunApi\Core\Support\Payload;
 
-/**
- * Generated audio file metadata.
- */
+/** Generated audio file metadata. */
 readonly class Audio extends BaseModel
 {
     /**
-     * Create an audio value object.
-     *
-     * @param array<string, mixed> $raw
+     * @param string $url URL to the generated audio file.
+     * @param array<string, mixed> $raw Raw response payload preserved by `toArray()`.
      */
     public function __construct(public string $url, array $raw = [])
     {
@@ -23,7 +20,7 @@ readonly class Audio extends BaseModel
     }
 
     /**
-     * Hydrate an audio from a RunAPI response object.
+     * Hydrate generated audio metadata from a RunAPI response object.
      *
      * @param array<string, mixed> $raw
      */

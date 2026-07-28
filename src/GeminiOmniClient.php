@@ -11,28 +11,21 @@ use RunApi\GeminiOmni\Resources\CreateCharacter;
 use RunApi\GeminiOmni\Resources\TextToVideo;
 
 /**
- * Provides Gemini Omni multimodal generation: voice presets, character creation, and text-to-video.
+ * Gemini Omni RunAPI PHP client.
  *
- * Exposes typed model resources plus the universal files and account resources.
+ * The client exposes typed model resources plus the universal `files` and
+ * `account` resources.
  */
 final class GeminiOmniClient extends BaseClient
 {
-    /**
-     * Text to video operations.
-     */
+    /** Text to video operations for Gemini Omni. */
     public readonly TextToVideo $textToVideo;
-    /**
-     * Create audio operations.
-     */
+    /** Create audio operations for Gemini Omni. */
     public readonly CreateAudio $createAudio;
-    /**
-     * Create character operations.
-     */
+    /** Create character operations for Gemini Omni. */
     public readonly CreateCharacter $createCharacter;
 
-    /**
-     * Create a Gemini Omni client with optional API key, base URL, and transport overrides.
-     */
+    /** Create a Gemini Omni client with optional API key, base URL, and transport overrides. */
     public function __construct(ClientOptions $options = new ClientOptions())
     {
         parent::__construct($options);

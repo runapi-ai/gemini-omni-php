@@ -6,26 +6,24 @@ namespace RunApi\GeminiOmni\Models;
 
 use RunApi\Core\Errors\ValidationException;
 use RunApi\Core\Models\BaseModel;
+use RunApi\Core\Models\TaskBillingFacts;
 use RunApi\Core\Support\Payload;
 
-/**
- * Async audio task response with lifecycle status and output files.
- */
+/** Response returned by create audio. */
 readonly class CreateAudioResponse extends BaseModel
 {
+    public ?TaskBillingFacts $billing;
+
     /**
-     * Create an audio creation response value object.
-     *
      * @param array<string, mixed> $raw
      */
-    public function __construct(public string $id, public ?GeminiOmniAudio $audio = null, public ?string $error = null, array $raw = [])
+    public function __construct(public string $id, public ?GeminiOmniAudio $audio = null, public ?string $error = null, array $raw = [], ?TaskBillingFacts $billing = null)
     {
-        parent::__construct($raw === [] ? ['id' => $id, 'audio' => $audio?->toArray(), 'error' => $error] : $raw);
+        $this->billing = $billing ?? self::billing($raw);
+        parent::__construct($raw === [] ? ['id' => $id, 'audio' => $audio?->toArray(), 'error' => $error, 'billing' => $this->billing?->toArray()] : $raw);
     }
 
     /**
-     * Hydrate an audio creation response from a RunAPI response object.
-     *
      * @param array<string, mixed> $raw
      */
     public static function fromArray(array $raw): self
@@ -60,5 +58,11 @@ readonly class CreateAudioResponse extends BaseModel
         }
 
         return $value;
+    }
+
+    /** @param array<string, mixed> $raw */
+    private static function billing(array $raw): ?TaskBillingFacts
+    {
+        return isset($raw['billing']) && is_array($raw['billing']) ? TaskBillingFacts::fromArray($raw['billing']) : null;
     }
 }

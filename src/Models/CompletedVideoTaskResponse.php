@@ -6,13 +6,11 @@ namespace RunApi\GeminiOmni\Models;
 
 use RunApi\Core\Support\Payload;
 
-/**
- * Completed video task response returned by run(); outputs are guaranteed present.
- */
+/** Completed video task response returned by `run()`; videos are guaranteed present. */
 readonly class CompletedVideoTaskResponse extends VideoTaskResponse
 {
     /**
-     * Hydrate a completed video task response from a RunAPI response object.
+     * Hydrate a completed task response and require generated videos.
      *
      * @param array<string, mixed> $raw
      */
@@ -21,9 +19,7 @@ readonly class CompletedVideoTaskResponse extends VideoTaskResponse
         return new self(id: Payload::string($raw, 'id'), status: Payload::string($raw, 'status'), error: self::error($raw), videos: self::videos($raw, required: true), raw: $raw);
     }
 
-    /**
-     * Narrow a polled task response after completion has been confirmed.
-     */
+    /** Narrow a polled task response after completion has been confirmed. */
     public static function fromResponse(VideoTaskResponse $response): self
     {
         return self::fromArray($response->toArray());

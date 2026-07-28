@@ -7,15 +7,12 @@ namespace RunApi\GeminiOmni\Models;
 use RunApi\Core\Models\BaseModel;
 use RunApi\Core\Support\Payload;
 
-/**
- * Generated video file metadata.
- */
+/** Generated video file metadata. */
 readonly class Video extends BaseModel
 {
     /**
-     * Create a video value object.
-     *
-     * @param array<string, mixed> $raw
+     * @param string $url URL to the generated video file.
+     * @param array<string, mixed> $raw Raw response payload preserved by `toArray()`.
      */
     public function __construct(public string $url, array $raw = [])
     {
@@ -23,7 +20,7 @@ readonly class Video extends BaseModel
     }
 
     /**
-     * Hydrate a video from a RunAPI response object.
+     * Hydrate generated video metadata from a RunAPI response object.
      *
      * @param array<string, mixed> $raw
      */
