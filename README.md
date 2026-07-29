@@ -10,8 +10,8 @@ errors in PHP.
 
 This README is the PHP package guide for the public `gemini-omni-php` split
 repository. For model details, use https://runapi.ai/models/gemini-omni; for API
-reference, use https://runapi.ai/docs#gemini-omni; for SDK docs, use
-https://runapi.ai/docs#sdk-gemini-omni.
+reference, use https://runapi.ai/docs/api/gemini-omni/text-to-video; for SDK docs, use
+https://runapi.ai/docs/resources/sdks.
 
 ## Install
 
@@ -89,8 +89,8 @@ or your secret manager; never commit API keys or callback secrets.
 ## Links
 
 - Model page: https://runapi.ai/models/gemini-omni
-- SDK docs: https://runapi.ai/docs#sdk-gemini-omni
-- Product docs: https://runapi.ai/docs#gemini-omni
+- SDK docs: https://runapi.ai/docs/resources/sdks
+- Product docs: https://runapi.ai/docs/api/gemini-omni/text-to-video
 - Pricing and rate limits: https://runapi.ai/models/gemini-omni
 - Full catalog: https://runapi.ai/models
 - GitHub repository: https://github.com/runapi-ai/gemini-omni-php

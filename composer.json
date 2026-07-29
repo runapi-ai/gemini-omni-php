@@ -33,7 +33,7 @@
   "homepage": "https://runapi.ai/models/gemini-omni",
   "support": {
     "source": "https://github.com/runapi-ai/gemini-omni-php",
-    "docs": "https://runapi.ai/docs#sdk-gemini-omni",
+    "docs": "https://runapi.ai/docs/resources/sdks",
     "issues": "https://github.com/runapi-ai/gemini-omni-php/issues"
   },
   "keywords": [
