@@ -17,6 +17,8 @@ readonly class TextToVideo extends TypedConfiguredResource
 {
     /**
      * Create a text to video task and return immediately with a task id.
+     * For gemini-omni-flash-1-1, first_frame_image_url cannot be combined with reference inputs,
+     * and last_frame_image_url requires first_frame_image_url.
      *
      * @param array{
      *   prompt: string,
@@ -25,6 +27,8 @@ readonly class TextToVideo extends TypedConfiguredResource
      *   callback_url?: string,
      *   character_ids?: list<string>,
      *   duration_seconds?: int,
+     *   first_frame_image_url?: string,
+     *   last_frame_image_url?: string,
      *   model?: string,
      *   output_resolution?: string,
      *   reference_image_urls?: list<string>,
@@ -48,6 +52,8 @@ readonly class TextToVideo extends TypedConfiguredResource
 
     /**
      * Create a text to video task and poll until it completes.
+     * For gemini-omni-flash-1-1, first_frame_image_url cannot be combined with reference inputs,
+     * and last_frame_image_url requires first_frame_image_url.
      *
      * @param array{
      *   prompt: string,
@@ -56,6 +62,8 @@ readonly class TextToVideo extends TypedConfiguredResource
      *   callback_url?: string,
      *   character_ids?: list<string>,
      *   duration_seconds?: int,
+     *   first_frame_image_url?: string,
+     *   last_frame_image_url?: string,
      *   model?: string,
      *   output_resolution?: string,
      *   reference_image_urls?: list<string>,

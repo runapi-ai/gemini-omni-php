@@ -38,43 +38,50 @@ $createAudioResult = $client->createAudio->run([
     'voice_description' => 'sample',
 ]);
 
+$character = $client->createCharacter->run([
+    'descriptions' => 'A silver-haired cyberpunk guide',
+    'reference_image_url' => 'https://cdn.runapi.ai/public/samples/portrait.jpg',
+    'body_reference_image_url' => 'https://cdn.runapi.ai/public/samples/image.jpg',
+]);
+
 $task = $client->textToVideo->create([
-    'model' => 'gemini-omni-flash-preview',
+    'model' => 'gemini-omni-flash-1-1',
     'aspect_ratio' => '16:9',
-    'audio_ids' => ['audio_1'],
-    'character_ids' => ['character_1'],
-    'duration_seconds' => 4,
-    'output_resolution' => '720p',
-    'prompt' => 'A precise product render on white marble',
-    'reference_image_urls' => ['https://cdn.runapi.ai/public/samples/image.jpg'],
-    'seed' => 1,
-    'video_list' => [['url' => 'https://cdn.runapi.ai/public/samples/video.mp4', 'start' => 0, 'ends' => 4]],
+    'duration_seconds' => 6,
+    'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
+    'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg',
+    'output_resolution' => '360p',
+    'prompt' => 'A precise product render travels from dawn into dusk',
 ]);
 
 $status = $client->textToVideo->get($task->id);
 
 $result = $client->textToVideo->run([
-    'model' => 'gemini-omni-flash-preview',
+    'model' => 'gemini-omni-flash-1-1',
     'aspect_ratio' => '16:9',
-    'audio_ids' => ['audio_1'],
-    'character_ids' => ['character_1'],
-    'duration_seconds' => 4,
-    'output_resolution' => '720p',
-    'prompt' => 'A serene mountain lake at dawn',
-    'reference_image_urls' => ['https://cdn.runapi.ai/public/samples/image.jpg'],
-    'seed' => 1,
-    'video_list' => [['url' => 'https://cdn.runapi.ai/public/samples/video.mp4', 'start' => 0, 'ends' => 4]],
+    'duration_seconds' => 6,
+    'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
+    'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg',
+    'output_resolution' => '360p',
+    'prompt' => 'A serene mountain lake travels from dawn into dusk',
 ]);
 
 echo $result->videos[0]->url . PHP_EOL;
 ```
+
+`$character->character->images` is ordered portrait first and optional full-body image second. A character created with both references consumes two of the seven reference units in a multimodal video request.
+
+For `gemini-omni-flash-1-1`, `first_frame_image_url` cannot be combined with reference images, audio IDs, video clips, or character IDs. `last_frame_image_url` requires `first_frame_image_url`.
 
 Use `create()` to submit a task and return quickly, `get()` to fetch the latest
 task state, and `run()` when a script should create and poll until completion.
 In web request handlers, prefer `create()` plus webhook or later `get()`
 polling so a worker is not held open.
 
-`createAudio` and `createCharacter` are synchronous resources and only expose `run()`.
+`createAudio` is a synchronous resource and only exposes `run()`.
+`createCharacter->run()` returns an immediate result when available. When RunAPI
+accepts the request for background execution, it follows the Task Result URL
+until the character response is ready.
 
 RunAPI-generated file URLs are temporary. Download and store generated files
 in your own durable storage within the retention window; do not treat returned
@@ -91,7 +98,7 @@ or your secret manager; never commit API keys or callback secrets.
 - Model page: https://runapi.ai/models/gemini-omni
 - SDK docs: https://runapi.ai/docs/resources/sdks
 - Product docs: https://runapi.ai/docs/api/gemini-omni/text-to-video
-- Pricing and rate limits: https://runapi.ai/models/gemini-omni
+- Flash 1.1 pricing and rate limits: https://runapi.ai/models/gemini-omni/flash-1-1
 - Full catalog: https://runapi.ai/models
 - GitHub repository: https://github.com/runapi-ai/gemini-omni-php
 - Multi-language SDK repository: https://github.com/runapi-ai/gemini-omni-sdk

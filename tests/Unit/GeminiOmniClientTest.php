@@ -84,6 +84,57 @@ final class GeminiOmniClientTest extends TestCase
         self::assertSame('/api/v1/gemini_omni/text_to_video/task_1', $transport->requests[1]->getUri()->getPath());
     }
 
+    public function testFlash11SendsFrameFieldsAnd360p(): void
+    {
+        $transport = new QueueHttpClient([
+            new Response(200, [], '{"id":"task_flash_1_1","status":"processing"}'),
+        ]);
+        $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
+
+        $client->textToVideo->create([
+            'model' => 'gemini-omni-flash-1-1',
+            'prompt' => 'A paper airplane crosses from dawn into dusk',
+            'duration_seconds' => 6,
+            'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
+            'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg',
+            'aspect_ratio' => '16:9',
+            'output_resolution' => '360p',
+        ]);
+
+        $body = json_decode((string) $transport->requests[0]->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame('gemini-omni-flash-1-1', $body['model']);
+        self::assertSame('https://cdn.runapi.ai/public/samples/first-frame.jpg', $body['first_frame_image_url']);
+        self::assertSame('https://cdn.runapi.ai/public/samples/last-frame.jpg', $body['last_frame_image_url']);
+        self::assertSame('360p', $body['output_resolution']);
+    }
+
+    public function testFlash11FrameRulesAreValidatedBeforeRequest(): void
+    {
+        $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: new QueueHttpClient([]), maxRetries: 0));
+
+        try {
+            $client->textToVideo->create([
+                'model' => 'gemini-omni-flash-1-1',
+                'prompt' => 'A paper airplane crosses from dawn into dusk',
+                'duration_seconds' => 6,
+                'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
+                'reference_image_urls' => ['https://cdn.runapi.ai/public/samples/reference-1.jpg'],
+            ]);
+            self::fail('Expected first-frame exclusivity validation to fail.');
+        } catch (ValidationException $error) {
+            self::assertSame('reference_image_urls is not allowed when first_frame_image_url is present and model is gemini-omni-flash-1-1', $error->getMessage());
+        }
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('first_frame_image_url is required when last_frame_image_url is present and model is gemini-omni-flash-1-1');
+        $client->textToVideo->create([
+            'model' => 'gemini-omni-flash-1-1',
+            'prompt' => 'A paper airplane crosses from dawn into dusk',
+            'duration_seconds' => 6,
+            'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg',
+        ]);
+    }
+
     public function testCompletedResponseRequiresResultFiles(): void
     {
         $transport = new QueueHttpClient([
@@ -143,25 +194,50 @@ final class GeminiOmniClientTest extends TestCase
         self::assertSame(12, $result->billing?->reservation?->amountCents);
         self::assertSame('/api/v1/gemini_omni/create_audio', $transport->requests[0]->getUri()->getPath());
     }
-    public function testCreateCharacterRunsSynchronously(): void
+    public function testCreateCharacterReturnsImmediateResponse(): void
     {
         $transport = new QueueHttpClient([
-            new Response(200, [], '{"character":{"id":"char_1","name":"Guide"},"billing":{"refund":{"refunded_at":"2026-07-23T12:00:00.000000Z"}},"id":"sync_character"}'),
+            new Response(200, [], '{"character":{"id":"char_1","name":"Guide","images":[{"url":"https://cdn.runapi.ai/public/samples/portrait.jpg"},{"url":"https://cdn.runapi.ai/public/samples/image.jpg"}]},"billing":{"refund":{"refunded_at":"2026-07-23T12:00:00.000000Z"}},"id":"sync_character"}'),
         ]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $result = $client->createCharacter->run([
         'model' => 'gemini-omni-character',
         'descriptions' => 'A friendly narrator wearing a blue jacket',
-        'reference_image_url' => 'https://cdn.runapi.ai/public/samples/image.jpg',
+        'reference_image_url' => 'https://cdn.runapi.ai/public/samples/portrait.jpg',
+        'body_reference_image_url' => 'https://cdn.runapi.ai/public/samples/image.jpg',
         'audio_ids' => ['audio_1'],
         'character_name' => 'Narrator',
         ]);
 
         self::assertInstanceOf(CreateCharacterResponse::class, $result);
         self::assertSame('char_1', $result->character?->id);
+        self::assertSame('https://cdn.runapi.ai/public/samples/image.jpg', $result->character->images[1]->url);
         self::assertSame('2026-07-23T12:00:00.000000Z', $result->billing?->refund?->refundedAt);
         self::assertSame('/api/v1/gemini_omni/create_character', $transport->requests[0]->getUri()->getPath());
+        $body = json_decode((string) $transport->requests[0]->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame('https://cdn.runapi.ai/public/samples/image.jpg', $body['body_reference_image_url']);
+    }
+
+    public function testCreateCharacterFollowsAcceptedTaskToItsTerminalResponse(): void
+    {
+        $transport = new QueueHttpClient([
+            new Response(202, ['Location' => '/api/v1/tasks/task_pending/result', 'Retry-After' => '0'], '{"id":"task_pending","status":"pending"}'),
+            new Response(200, [], '{"id":"task_pending","status":"completed","response":{"status":200,"content_type":"application/json","headers":{},"body":{"id":"char_1","character":{"id":"char_1","name":"Guide"}}}}'),
+        ]);
+        $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
+
+        $result = $client->createCharacter->run([
+            'model' => 'gemini-omni-character',
+            'descriptions' => 'A friendly narrator wearing a blue jacket',
+            'reference_image_url' => 'https://cdn.runapi.ai/public/samples/portrait.jpg',
+        ]);
+
+        self::assertInstanceOf(CreateCharacterResponse::class, $result);
+        self::assertSame('char_1', $result->id);
+        self::assertSame('char_1', $result->character?->id);
+        self::assertCount(2, $transport->requests);
+        self::assertSame('/api/v1/tasks/task_pending/result', $transport->requests[1]->getUri()->getPath());
     }
 
     public function testSecondaryResourceUsesItsOwnPath(): void

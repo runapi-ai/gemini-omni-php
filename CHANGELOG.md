@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.3.1](https://github.com/runapi-ai/gemini-omni-php/releases/tag/v0.3.1) - 2026-09-07
+
+### Added
+- Add the gemini-omni-flash-1-1 model with 360p through 4K video generation.
+- Add first-frame and last-frame controls with model-specific request validation.
+- Add an optional full-body reference image when creating a character and preserve both ordered character images.
+
+### Changed
+- Document that dual-image characters consume two video reference units.
+
+### Fixed
+- Follow accepted character Tasks through Task Result before returning the created character.
+
+
 ## [v0.3.0](https://github.com/runapi-ai/gemini-omni-php/releases/tag/v0.3.0) - 2026-07-28
 
 ### Breaking

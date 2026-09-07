@@ -6,18 +6,20 @@ namespace RunApi\GeminiOmni\Resources;
 
 use RunApi\Core\Http\HttpClient;
 use RunApi\Core\RequestOptions;
+use RunApi\Core\Resources\HybridResource;
 use RunApi\GeminiOmni\Models\CreateCharacterResponse;
 
-/** Create character operations for Gemini Omni. */
-readonly class CreateCharacter extends SyncResource
+/** Create a Gemini Omni character from a portrait and optional full-body reference. */
+readonly class CreateCharacter extends HybridResource
 {
     /**
-     * Run create character and return its response.
+     * Create a character and return its terminal response.
      *
      * @param array{
      *   descriptions: string,
      *   model: string,
      *   reference_image_url: string,
+     *   body_reference_image_url?: string,
      *   audio_ids?: list<string>,
      *   character_name?: string
      * } $params

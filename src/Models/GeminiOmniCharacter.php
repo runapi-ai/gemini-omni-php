@@ -16,7 +16,7 @@ readonly class GeminiOmniCharacter extends BaseModel
     /**
      * Create a Gemini Omni character value object.
      *
-     * @param list<ImageMetadata> $images
+     * @param list<ImageMetadata> $images Portrait first, then the optional full-body image.
      * @param array<string, mixed> $raw
      */
     public function __construct(public string $id, public ?string $name = null, public array $images = [], array $raw = [])
