@@ -31,8 +31,7 @@ final class GeminiOmniClientTest extends TestCase
     public function testCreatePostsCompactedBodyToCorrectPath(): void
     {
         $transport = new QueueHttpClient([
-            new Response(200, [], '{"id":"task_1"}'),
-        ]);
+            new Response(200, [], '{"id":"task_1"}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $task = $client->textToVideo->create([
@@ -46,8 +45,7 @@ final class GeminiOmniClientTest extends TestCase
             'aspect_ratio' => '16:9',
             'output_resolution' => '720p',
             'seed' => 1,
-            'callback_url' => '',
-        ]);
+            'callback_url' => '']);
 
         $body = json_decode((string) $transport->requests[0]->getBody(), true, flags: JSON_THROW_ON_ERROR);
 
@@ -61,8 +59,7 @@ final class GeminiOmniClientTest extends TestCase
     {
         $transport = new QueueHttpClient([
             new Response(200, [], '{"id":"task_1"}'),
-            new Response(200, [], '{"id":"task_1","status":"completed","videos":[{"url":"https://file.runapi.ai/result"}],"generation_stage":"all_audios_ready","extra_field":"kept"}'),
-        ]);
+            new Response(200, [], '{"id":"task_1","status":"completed","videos":[{"url":"https://file.runapi.ai/result"}],"generation_stage":"all_audios_ready","extra_field":"kept","usage":{"cost":0.05}}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $result = $client->textToVideo->run([
@@ -75,8 +72,7 @@ final class GeminiOmniClientTest extends TestCase
             'character_ids' => ['character_1'],
             'aspect_ratio' => '16:9',
             'output_resolution' => '720p',
-            'seed' => 1,
-        ]);
+            'seed' => 1]);
 
         self::assertInstanceOf(CompletedVideoTaskResponse::class, $result);
         self::assertSame('https://file.runapi.ai/result', $result->videos[0]->url);
@@ -87,8 +83,7 @@ final class GeminiOmniClientTest extends TestCase
     public function testFlash11SendsFrameFieldsAnd360p(): void
     {
         $transport = new QueueHttpClient([
-            new Response(200, [], '{"id":"task_flash_1_1","status":"processing"}'),
-        ]);
+            new Response(200, [], '{"id":"task_flash_1_1","status":"processing"}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $client->textToVideo->create([
@@ -98,8 +93,7 @@ final class GeminiOmniClientTest extends TestCase
             'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
             'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg',
             'aspect_ratio' => '16:9',
-            'output_resolution' => '360p',
-        ]);
+            'output_resolution' => '360p']);
 
         $body = json_decode((string) $transport->requests[0]->getBody(), true, flags: JSON_THROW_ON_ERROR);
         self::assertSame('gemini-omni-flash-1-1', $body['model']);
@@ -118,8 +112,7 @@ final class GeminiOmniClientTest extends TestCase
                 'prompt' => 'A paper airplane crosses from dawn into dusk',
                 'duration_seconds' => 6,
                 'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
-                'reference_image_urls' => ['https://cdn.runapi.ai/public/samples/reference-1.jpg'],
-            ]);
+                'reference_image_urls' => ['https://cdn.runapi.ai/public/samples/reference-1.jpg']]);
             self::fail('Expected first-frame exclusivity validation to fail.');
         } catch (ValidationException $error) {
             self::assertSame('reference_image_urls is not allowed when first_frame_image_url is present and model is gemini-omni-flash-1-1', $error->getMessage());
@@ -131,16 +124,14 @@ final class GeminiOmniClientTest extends TestCase
             'model' => 'gemini-omni-flash-1-1',
             'prompt' => 'A paper airplane crosses from dawn into dusk',
             'duration_seconds' => 6,
-            'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg',
-        ]);
+            'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg']);
     }
 
     public function testCompletedResponseRequiresResultFiles(): void
     {
         $transport = new QueueHttpClient([
             new Response(200, [], '{"id":"task_1"}'),
-            new Response(200, [], '{"id":"task_1","status":"completed"}'),
-        ]);
+            new Response(200, [], '{"id":"task_1","status":"completed","usage":{"cost":0.05}}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $this->expectException(ValidationException::class);
@@ -156,8 +147,7 @@ final class GeminiOmniClientTest extends TestCase
             'character_ids' => ['character_1'],
             'aspect_ratio' => '16:9',
             'output_resolution' => '720p',
-            'seed' => 1,
-        ]);
+            'seed' => 1]);
     }
 
     public function testRejectsInvalidContractEnum(): void
@@ -171,14 +161,12 @@ final class GeminiOmniClientTest extends TestCase
         'model' => 'gemini-omni-flash-preview',
         'prompt' => 'A product render',
         'output_resolution' => '720p',
-        'aspect_ratio' => 'not-valid',
-        ]);
+        'aspect_ratio' => 'not-valid']);
     }
     public function testCreateAudioRunsSynchronously(): void
     {
         $transport = new QueueHttpClient([
-            new Response(200, [], '{"audio":{"id":"voice_1","name":"Narrator"},"billing":{"reservation":{"amount_cents":12}},"id":"sync_audio"}'),
-        ]);
+            new Response(200, [], '{"audio":{"id":"voice_1","name":"Narrator"},"id":"sync_audio"}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $result = $client->createAudio->run([
@@ -186,19 +174,16 @@ final class GeminiOmniClientTest extends TestCase
         'audio_id' => 'zephyr',
         'name' => 'sample',
         'voice_description' => 'sample',
-        'example_dialogue' => 'sample',
-        ]);
+        'example_dialogue' => 'sample']);
 
         self::assertInstanceOf(CreateAudioResponse::class, $result);
         self::assertSame('voice_1', $result->audio?->id);
-        self::assertSame(12, $result->billing?->reservation?->amountCents);
         self::assertSame('/api/v1/gemini_omni/create_audio', $transport->requests[0]->getUri()->getPath());
     }
     public function testCreateCharacterReturnsImmediateResponse(): void
     {
         $transport = new QueueHttpClient([
-            new Response(200, [], '{"character":{"id":"char_1","name":"Guide","images":[{"url":"https://cdn.runapi.ai/public/samples/portrait.jpg"},{"url":"https://cdn.runapi.ai/public/samples/image.jpg"}]},"billing":{"refund":{"refunded_at":"2026-07-23T12:00:00.000000Z"}},"id":"sync_character"}'),
-        ]);
+            new Response(200, [], '{"character":{"id":"char_1","name":"Guide","images":[{"url":"https://cdn.runapi.ai/public/samples/portrait.jpg"},{"url":"https://cdn.runapi.ai/public/samples/image.jpg"}]},"id":"sync_character"}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $result = $client->createCharacter->run([
@@ -207,13 +192,11 @@ final class GeminiOmniClientTest extends TestCase
         'reference_image_url' => 'https://cdn.runapi.ai/public/samples/portrait.jpg',
         'body_reference_image_url' => 'https://cdn.runapi.ai/public/samples/image.jpg',
         'audio_ids' => ['audio_1'],
-        'character_name' => 'Narrator',
-        ]);
+        'character_name' => 'Narrator']);
 
         self::assertInstanceOf(CreateCharacterResponse::class, $result);
         self::assertSame('char_1', $result->character?->id);
         self::assertSame('https://cdn.runapi.ai/public/samples/image.jpg', $result->character->images[1]->url);
-        self::assertSame('2026-07-23T12:00:00.000000Z', $result->billing?->refund?->refundedAt);
         self::assertSame('/api/v1/gemini_omni/create_character', $transport->requests[0]->getUri()->getPath());
         $body = json_decode((string) $transport->requests[0]->getBody(), true, flags: JSON_THROW_ON_ERROR);
         self::assertSame('https://cdn.runapi.ai/public/samples/image.jpg', $body['body_reference_image_url']);
@@ -223,15 +206,13 @@ final class GeminiOmniClientTest extends TestCase
     {
         $transport = new QueueHttpClient([
             new Response(202, ['Location' => '/api/v1/tasks/task_pending/result', 'Retry-After' => '0'], '{"id":"task_pending","status":"pending"}'),
-            new Response(200, [], '{"id":"task_pending","status":"completed","response":{"status":200,"content_type":"application/json","headers":{},"body":{"id":"char_1","character":{"id":"char_1","name":"Guide"}}}}'),
-        ]);
+            new Response(200, [], '{"id":"task_pending","status":"completed","response":{"status":200,"content_type":"application/json","headers":{},"body":{"id":"char_1","character":{"id":"char_1","name":"Guide"}}},"usage":{"cost":0.05}}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $result = $client->createCharacter->run([
             'model' => 'gemini-omni-character',
             'descriptions' => 'A friendly narrator wearing a blue jacket',
-            'reference_image_url' => 'https://cdn.runapi.ai/public/samples/portrait.jpg',
-        ]);
+            'reference_image_url' => 'https://cdn.runapi.ai/public/samples/portrait.jpg']);
 
         self::assertInstanceOf(CreateCharacterResponse::class, $result);
         self::assertSame('char_1', $result->id);
@@ -243,8 +224,7 @@ final class GeminiOmniClientTest extends TestCase
     public function testSecondaryResourceUsesItsOwnPath(): void
     {
         $transport = new QueueHttpClient([
-            new Response(200, [], '{"audio":{"id":"voice_1","name":"Narrator"},"billing":{"reservation":{"amount_cents":12}},"id":"sync_audio"}'),
-        ]);
+            new Response(200, [], '{"audio":{"id":"voice_1","name":"Narrator"},"id":"sync_audio"}')]);
         $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: $transport, maxRetries: 0));
 
         $client->createAudio->run([
@@ -252,8 +232,7 @@ final class GeminiOmniClientTest extends TestCase
             'audio_id' => 'zephyr',
             'name' => 'sample',
             'voice_description' => 'sample',
-            'example_dialogue' => 'sample',
-        ]);
+            'example_dialogue' => 'sample']);
 
         self::assertSame('/api/v1/gemini_omni/create_audio', $transport->requests[0]->getUri()->getPath());
     }

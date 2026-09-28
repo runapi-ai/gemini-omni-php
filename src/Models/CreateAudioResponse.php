@@ -6,21 +6,17 @@ namespace RunApi\GeminiOmni\Models;
 
 use RunApi\Core\Errors\ValidationException;
 use RunApi\Core\Models\BaseModel;
-use RunApi\Core\Models\TaskBillingFacts;
 use RunApi\Core\Support\Payload;
 
 /** Response returned by create audio. */
 readonly class CreateAudioResponse extends BaseModel
 {
-    public ?TaskBillingFacts $billing;
-
     /**
      * @param array<string, mixed> $raw
      */
-    public function __construct(public string $id, public ?GeminiOmniAudio $audio = null, public ?string $error = null, array $raw = [], ?TaskBillingFacts $billing = null)
+    public function __construct(public string $id, public ?GeminiOmniAudio $audio = null, public ?string $error = null, array $raw = [])
     {
-        $this->billing = $billing ?? self::billing($raw);
-        parent::__construct($raw === [] ? ['id' => $id, 'audio' => $audio?->toArray(), 'error' => $error, 'billing' => $this->billing?->toArray()] : $raw);
+        parent::__construct($raw === [] ? ['id' => $id, 'audio' => $audio?->toArray(), 'error' => $error] : $raw);
     }
 
     /**
@@ -58,11 +54,5 @@ readonly class CreateAudioResponse extends BaseModel
         }
 
         return $value;
-    }
-
-    /** @param array<string, mixed> $raw */
-    private static function billing(array $raw): ?TaskBillingFacts
-    {
-        return isset($raw['billing']) && is_array($raw['billing']) ? TaskBillingFacts::fromArray($raw['billing']) : null;
     }
 }
