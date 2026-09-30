@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace RunApi\GeminiOmni\Resources;
 
-use RunApi\Core\Contract\ContractValidator;
 use RunApi\Core\Errors\ValidationException;
 use RunApi\Core\Http\HttpClient;
 use RunApi\Core\Models\BaseModel;
@@ -17,28 +16,20 @@ abstract readonly class SyncResource
     public function __construct(
         protected HttpClient $http,
         private string $endpoint,
-        private string $action,
         private string $responseClass,
-        private ContractValidator $validator = new ContractValidator(),
     ) {
     }
 
     /** @param array<string, mixed> $params */
     public function run(array $params, ?RequestOptions $options = null): BaseModel
     {
-        $params = $this->compact($params);
-        $model = $params['model'] ?? '_';
-        if (!is_string($model)) {
-            throw new ValidationException('model must be a string');
-        }
-        $this->validator->validate($this->action, $model, $params);
         $factory = [$this->responseClass, 'fromArray'];
         if (!is_callable($factory)) {
             throw new ValidationException($this->responseClass . ' must define fromArray');
         }
 
         $response = $factory($this->http->request('post', $this->endpoint, [
-            'body' => $params,
+            'body' => $this->compact($params),
             'options' => $options,
         ]));
         if (!$response instanceof BaseModel) {

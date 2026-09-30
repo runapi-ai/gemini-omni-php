@@ -102,30 +102,7 @@ final class GeminiOmniClientTest extends TestCase
         self::assertSame('360p', $body['output_resolution']);
     }
 
-    public function testFlash11FrameRulesAreValidatedBeforeRequest(): void
-    {
-        $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: new QueueHttpClient([]), maxRetries: 0));
 
-        try {
-            $client->textToVideo->create([
-                'model' => 'gemini-omni-flash-1-1',
-                'prompt' => 'A paper airplane crosses from dawn into dusk',
-                'duration_seconds' => 6,
-                'first_frame_image_url' => 'https://cdn.runapi.ai/public/samples/first-frame.jpg',
-                'reference_image_urls' => ['https://cdn.runapi.ai/public/samples/reference-1.jpg']]);
-            self::fail('Expected first-frame exclusivity validation to fail.');
-        } catch (ValidationException $error) {
-            self::assertSame('reference_image_urls is not allowed when first_frame_image_url is present and model is gemini-omni-flash-1-1', $error->getMessage());
-        }
-
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('first_frame_image_url is required when last_frame_image_url is present and model is gemini-omni-flash-1-1');
-        $client->textToVideo->create([
-            'model' => 'gemini-omni-flash-1-1',
-            'prompt' => 'A paper airplane crosses from dawn into dusk',
-            'duration_seconds' => 6,
-            'last_frame_image_url' => 'https://cdn.runapi.ai/public/samples/last-frame.jpg']);
-    }
 
     public function testCompletedResponseRequiresResultFiles(): void
     {
@@ -150,19 +127,7 @@ final class GeminiOmniClientTest extends TestCase
             'seed' => 1]);
     }
 
-    public function testRejectsInvalidContractEnum(): void
-    {
-        $client = new GeminiOmniClient(new ClientOptions(apiKey: 'k', httpClient: new QueueHttpClient([]), maxRetries: 0));
 
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('aspect_ratio must be one of the allowed values');
-
-        $client->textToVideo->create([
-        'model' => 'gemini-omni-flash-preview',
-        'prompt' => 'A product render',
-        'output_resolution' => '720p',
-        'aspect_ratio' => 'not-valid']);
-    }
     public function testCreateAudioRunsSynchronously(): void
     {
         $transport = new QueueHttpClient([

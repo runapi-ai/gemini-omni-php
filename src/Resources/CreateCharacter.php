@@ -38,7 +38,6 @@ readonly class CreateCharacter extends HybridResource
         return new self(
             $http,
             '/api/v1/gemini_omni/create_character',
-            'gemini-omni/create-character',
             CreateCharacterResponse::class,
         );
     }

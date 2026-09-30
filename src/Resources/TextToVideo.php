@@ -10,7 +10,6 @@ use RunApi\Core\RequestOptions;
 use RunApi\Core\Resources\TypedConfiguredResource;
 use RunApi\GeminiOmni\Models\CompletedVideoTaskResponse;
 use RunApi\GeminiOmni\Models\VideoTaskResponse;
-use RunApi\GeminiOmni\Types;
 
 /** Text to video operations for Gemini Omni. */
 readonly class TextToVideo extends TypedConfiguredResource
@@ -85,10 +84,8 @@ readonly class TextToVideo extends TypedConfiguredResource
         return new self(
             $http,
             '/api/v1/gemini_omni/text_to_video',
-            'gemini-omni/text-to-video',
             VideoTaskResponse::class,
             CompletedVideoTaskResponse::class,
-            Types::TEXT_TO_VIDEO_MODELS,
             'text-to-video',
             VideoTaskResponse::class,
             CompletedVideoTaskResponse::class,

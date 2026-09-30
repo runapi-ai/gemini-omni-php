@@ -36,7 +36,6 @@ readonly class CreateAudio extends SyncResource
         return new self(
             $http,
             '/api/v1/gemini_omni/create_audio',
-            'gemini-omni/create-audio',
             CreateAudioResponse::class,
         );
     }
